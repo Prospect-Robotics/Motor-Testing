@@ -1,5 +1,6 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
+  "java.gradle.buildServer.enabled": "off",
   "java.server.launchMode": "Standard",
   "files.exclude": {
     "**/.git": true,
