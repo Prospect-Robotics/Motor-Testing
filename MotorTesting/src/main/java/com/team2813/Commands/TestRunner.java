@@ -1,5 +1,7 @@
 package com.team2813.Commands;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +10,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.stream.Stream;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -90,18 +93,19 @@ public class TestRunner extends Command {
 		return currentTest >= tests.size();
 	}
 
-	private static Set<Class<? extends MotorTest>> getAllClasses() {
-		String packageName = "com.team2813.Commands";
-		try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
-				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-				BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-			return bufferedReader.lines()
-				.filter(line -> line.endsWith(".class"))
-				.map(line -> getClass(line, packageName))
-				.collect(Collectors.toSet());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	private static Iterable<Class<? extends MotorTest>> getAllClasses() {
+		return Stream.of(ForwardTest.class, ReverseTest.class).toList();
+		// String packageName = "com.team2813.Commands";
+		// try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
+		// 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		// 		BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+		// 	return bufferedReader.lines()
+		// 		.filter(line -> line.endsWith(".class"))
+		// 		.map(line -> getClass(line, packageName))
+		// 		.collect(Collectors.toSet());
+		// } catch (IOException e) {
+		// 	throw new RuntimeException(e);
+		// }
 	}
 
 	private static Class<? extends MotorTest> getClass(String className, String packageName) {
