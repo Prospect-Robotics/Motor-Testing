@@ -4,8 +4,9 @@
 
 package com.team2813;
 
+import com.team2813.Commands.TestRunner;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer {
   public RobotContainer() {
@@ -15,6 +16,6 @@ public class RobotContainer {
   private void configureBindings() {}
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new TestRunner();
   }
 }

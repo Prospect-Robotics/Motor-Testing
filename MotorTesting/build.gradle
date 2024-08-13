@@ -54,6 +54,7 @@ dependencies {
     implementation wpi.java.vendor.java()
 
 	implementation "org.json:json:20240303"
+	implementation "com.google.code.gson:gson:2.11.0"
 	implementation "com.team2813:lib2813"
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
