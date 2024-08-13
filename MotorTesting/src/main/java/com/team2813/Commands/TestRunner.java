@@ -76,7 +76,11 @@ public class TestRunner extends Command {
 		}
 		
 		curr.end(!success);
-		return tests.peek();
+		curr = tests.peek();
+		if (curr != null) {
+			curr.initialize();
+		}
+		return curr;
 	}
 
 	@Override

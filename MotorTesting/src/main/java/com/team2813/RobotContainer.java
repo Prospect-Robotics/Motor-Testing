@@ -15,7 +15,9 @@ public class RobotContainer {
 
   private void configureBindings() {}
 
+  private Command auto_command = new TestRunner();
+
   public Command getAutonomousCommand() {
-    return new TestRunner();
+    return auto_command;
   }
 }

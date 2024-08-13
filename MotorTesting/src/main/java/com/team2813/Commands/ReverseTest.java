@@ -1,6 +1,7 @@
 package com.team2813.Commands;
 
 import com.team2813.MotorTest;
+import com.team2813.NotEnoughVelocityException;
 import com.team2813.Subsystems.MotorTester;
 import com.team2813.lib2813.control.ControlMode;
 
@@ -34,8 +35,8 @@ public class ReverseTest extends MotorTest {
 			if (velocity > 1) {
 				throw new RuntimeException("Running in wrong direction");
 			}
-			if (velocity > -1) {
-				throw new RuntimeException("Running at less than 1 rotation per second");
+			if (velocity > -50) {
+				throw new NotEnoughVelocityException(-50, velocity);
 			}
 		}
 	}
