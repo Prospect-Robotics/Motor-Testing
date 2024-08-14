@@ -1,7 +1,5 @@
 package com.team2813.Commands;
 
-import static java.util.stream.Collectors.toSet;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +8,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.stream.Stream;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.team2813.MotorTest;
 import com.team2813.Subsystems.MotorTester;
@@ -21,14 +18,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class TestRunner extends Command {
-	private Queue<MotorTest> tests = new ArrayDeque<>();
+	public Queue<MotorTest> tests = new ArrayDeque<>();
 	private int currentTest = 0;
 	public TestRunner() {
 		MotorTester motorTester = new MotorTester();
 		motorTester.findMotor();
-		for (Class<? extends MotorTest> test : getAllClasses()) {
+		for (Class<? extends MotorTest> test : getAllClasses("com.team2813.Commands")) {
 			try {
 				Constructor<? extends MotorTest> constructor = test.getConstructor(MotorTester.class);
+				//DriverStation.reportWarning(String.format("Found class: %s", test.getCanonicalName()), false);
 				tests.add(constructor.newInstance(motorTester));
 			} catch (NoSuchMethodException | IllegalAccessException | InstantiationException e) {
 				// If no constructor exists, don't add anything (eat the exception)
@@ -97,33 +95,33 @@ public class TestRunner extends Command {
 		return currentTest >= tests.size();
 	}
 
-	private static Iterable<Class<? extends MotorTest>> getAllClasses() {
-		return Stream.of(ForwardTest.class, ReverseTest.class).toList();
-		// String packageName = "com.team2813.Commands";
-		// try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
-		// 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-		// 		BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-		// 	return bufferedReader.lines()
-		// 		.filter(line -> line.endsWith(".class"))
-		// 		.map(line -> getClass(line, packageName))
-		// 		.collect(Collectors.toSet());
-		// } catch (IOException e) {
-		// 	throw new RuntimeException(e);
-		// }
+	private static Iterable<Class<? extends MotorTest>> getAllClasses(String packageName) {
+		// return Stream.of(ForwardTest.class, ReverseTest.class).toList();
+		try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
+				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+				BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+			return bufferedReader.lines()
+				.filter(line -> line.endsWith(".class"))
+				.flatMap(line -> getClasses(line, packageName))
+				.collect(Collectors.toSet());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	private static Class<? extends MotorTest> getClass(String className, String packageName) {
+	private static Stream<Class<? extends MotorTest>> getClasses(String className, String packageName) {
 		try {
-			Class<?> rawClass = Class.forName(packageName + "." + className.substring(0, className.lastIndexOf(".")));
+            Class<?> rawClass =  Class.forName(packageName + "."
+              + className.substring(0, className.lastIndexOf('.')));
 			if (MotorTest.class.isAssignableFrom(rawClass)) {
 				// guaranteed to succed, as rawClass extends MotorTest (isAssignableFrom test)
 				@SuppressWarnings("unchecked")
 				Class<? extends MotorTest> castedClass = (Class<? extends MotorTest>) rawClass;
-				return castedClass;
+				return Stream.of(castedClass);
 			}
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		return null;
+        } catch (ClassNotFoundException e) {
+            // handle the exception
+        }
+        return Stream.empty();
 	}
 }

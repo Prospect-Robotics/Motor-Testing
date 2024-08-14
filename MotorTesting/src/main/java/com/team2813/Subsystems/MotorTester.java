@@ -9,8 +9,6 @@ import com.team2813.lib2813.control.encoders.CancoderWrapper;
 import com.team2813.lib2813.control.motors.TalonFXWrapper;
 
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.FloatPublisher;
-import edu.wpi.first.networktables.FloatTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;

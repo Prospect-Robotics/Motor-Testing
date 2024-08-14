@@ -1,6 +1,7 @@
 package com.team2813.Commands;
 
 import com.team2813.MotorTest;
+import com.team2813.NotEnoughVelocityException;
 import com.team2813.Subsystems.MotorTester;
 import com.team2813.lib2813.control.ControlMode;
 
@@ -35,26 +36,8 @@ public class ForwardTest extends MotorTest {
 				throw new RuntimeException("Running in wrong direction");
 			}
 			if (velocity < 50) {
-				throw new RuntimeException("Expected at least 50rps, was ");
+				throw new NotEnoughVelocityException(50, velocity);
 			}
-		}
-	}
-
-	class NotEnoughVelocityException extends RuntimeException {
-		private final double expected;
-		private final double actual;
-		NotEnoughVelocityException(double expected, double actual) {
-			super(String.format("Expected a velocity of %.2d, but was %.2d"));
-			this.expected = expected;
-			this.actual = actual;
-		}
-
-		public double getExpectedVelocity() {
-			return expected;
-		}
-
-		public double getActualVelocity() {
-			return actual;
 		}
 	}
 
