@@ -11,6 +11,10 @@ import com.team2813.lib2813.control.motors.TalonFXWrapper;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+
+import java.util.OptionalDouble;
+
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MotorTester extends SubsystemBase {
@@ -25,7 +29,7 @@ public class MotorTester extends SubsystemBase {
 			id = getter.getId();
 		} catch (DeviceNotFoundException e) {
 			DriverStation.reportError(e.getMessage(), false);
-			id = 0;
+			id = 3;
 		}
 		motor = new TalonFXWrapper(id, InvertType.CLOCKWISE);
 	}
@@ -34,14 +38,23 @@ public class MotorTester extends SubsystemBase {
 		return motor;
 	}
 
+	public OptionalDouble getTemp() {
+		if (motor instanceof TalonFXWrapper wrapper) {
+			return OptionalDouble.of(wrapper.motor().getDeviceTemp().getValueAsDouble());
+		}
+		return OptionalDouble.empty();
+	}
+
 	public Encoder getEncoder() {
 		return encoder;
 	}
 
 	private DoublePublisher velocity = NetworkTableInstance.getDefault().getDoubleTopic("motor_velocity").publish();
+	private DoublePublisher temperature_c = NetworkTableInstance.getDefault().getDoubleTopic("motor_temperature_c").publish();
 
 	@Override
 	public void periodic() {
 		velocity.accept(motor.getVelocity());
+		getTemp().ifPresent(temperature_c::accept);
 	}
 }

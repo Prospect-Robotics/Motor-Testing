@@ -20,8 +20,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class TestRunner extends Command {
 	public Queue<MotorTest> tests = new ArrayDeque<>();
 	private int currentTest = 0;
+	private final MotorTester motorTester;
 	public TestRunner() {
-		MotorTester motorTester = new MotorTester();
+		motorTester = new MotorTester();
 		motorTester.findMotor();
 		for (Class<? extends MotorTest> test : getAllClasses("com.team2813.Commands")) {
 			try {
@@ -41,6 +42,7 @@ public class TestRunner extends Command {
 
 	@Override
 	public void initialize() {
+		motorTester.findMotor();
 		MotorTest nextTest = tests.peek();
 		if (nextTest != null) {
 			nextTest.initialize();
@@ -96,17 +98,17 @@ public class TestRunner extends Command {
 	}
 
 	private static Iterable<Class<? extends MotorTest>> getAllClasses(String packageName) {
-		// return Stream.of(ForwardTest.class, ReverseTest.class).toList();
-		try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
-				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-				BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-			return bufferedReader.lines()
-				.filter(line -> line.endsWith(".class"))
-				.flatMap(line -> getClasses(line, packageName))
-				.collect(Collectors.toSet());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return Stream.of(ForwardTest.class, ReverseTest.class, LongForwardTest.class, LongReverseTest.class).toList();
+		// try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
+		// 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		// 		BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+		// 	return bufferedReader.lines()
+		// 		.filter(line -> line.endsWith(".class"))
+		// 		.flatMap(line -> getClasses(line, packageName))
+		// 		.collect(Collectors.toSet());
+		// } catch (IOException e) {
+		// 	throw new RuntimeException(e);
+		// }
 	}
 
 	private static Stream<Class<? extends MotorTest>> getClasses(String className, String packageName) {
