@@ -16,7 +16,7 @@ import com.team2813.Commands.TestRunner;
 public class ClassResolutionTest {
 	@Test
 	public void EnsureContainsClasses() {
-		List<Class<? extends MotorTest>> classes = new ArrayList<>(TestRunner.getAllClasses(TestRunner.PACKAGE_NAME));
+		List<Class<? extends MotorTest>> classes = new ArrayList<>(TestRunner.getAllClasses());
 		assertTrue("ForwardTest", classes.contains(ForwardTest.class));
 		assertTrue("ReverseTest", classes.contains(ReverseTest.class));
 		assertTrue("LongForwardTest", classes.contains(LongForwardTest.class));

@@ -1,9 +1,5 @@
 package com.team2813.Commands;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
@@ -25,11 +21,10 @@ public class TestRunner extends Command {
 	public Queue<MotorTest> tests = new ArrayDeque<>();
 	private int currentTest = 0;
 	private final MotorTester motorTester;
-	public static final String PACKAGE_NAME = "com.team2813.Commands";
 	public TestRunner() {
 		motorTester = new MotorTester();
 		motorTester.findMotor();
-		for (Class<? extends MotorTest> test : getAllClasses(PACKAGE_NAME)) {
+		for (Class<? extends MotorTest> test : getAllClasses()) {
 			try {
 				Constructor<? extends MotorTest> constructor = test.getConstructor(MotorTester.class);
 				//DriverStation.reportWarning(String.format("Found class: %s", test.getCanonicalName()), false);
@@ -102,10 +97,10 @@ public class TestRunner extends Command {
 		return currentTest >= tests.size();
 	}
 
-	public static Collection<Class<? extends MotorTest>> getAllClasses(String packageName) {
+	public static Collection<Class<? extends MotorTest>> getAllClasses() {
 		try {
 			return ClassPath.from(ClassLoader.getSystemClassLoader()).getAllClasses().stream()
-			.filter(clazz -> clazz.getPackageName().equalsIgnoreCase(packageName))
+			.filter(clazz -> clazz.getPackageName().startsWith("com.team2813"))
 			.map(ClassInfo::load)
 			.flatMap(TestRunner::castClass)
 			.collect(Collectors.toSet());
