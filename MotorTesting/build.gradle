@@ -76,7 +76,8 @@ dependencies {
 
 downloadDepsPreemptively.dependsOn gradle.includedBuild("lib2813").task(":lib:jar")
 
-tasks.named("test") {
+tasks.named('test') {
+    // Use JUnit 4 for unit tests.
     useJUnit()
 }
 

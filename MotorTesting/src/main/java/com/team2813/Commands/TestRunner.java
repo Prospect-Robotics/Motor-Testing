@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Queue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,10 +22,11 @@ public class TestRunner extends Command {
 	public Queue<MotorTest> tests = new ArrayDeque<>();
 	private int currentTest = 0;
 	private final MotorTester motorTester;
+	public static final String PACKAGE_NAME = "com.team2813.Commands";
 	public TestRunner() {
 		motorTester = new MotorTester();
 		motorTester.findMotor();
-		for (Class<? extends MotorTest> test : getAllClasses("com.team2813.Commands")) {
+		for (Class<? extends MotorTest> test : getAllClasses(PACKAGE_NAME)) {
 			try {
 				Constructor<? extends MotorTest> constructor = test.getConstructor(MotorTester.class);
 				//DriverStation.reportWarning(String.format("Found class: %s", test.getCanonicalName()), false);
@@ -97,18 +99,17 @@ public class TestRunner extends Command {
 		return currentTest >= tests.size();
 	}
 
-	private static Iterable<Class<? extends MotorTest>> getAllClasses(String packageName) {
-		return Stream.of(ForwardTest.class, ReverseTest.class, LongForwardTest.class, LongReverseTest.class).toList();
-		// try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
-		// 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-		// 		BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-		// 	return bufferedReader.lines()
-		// 		.filter(line -> line.endsWith(".class"))
-		// 		.flatMap(line -> getClasses(line, packageName))
-		// 		.collect(Collectors.toSet());
-		// } catch (IOException e) {
-		// 	throw new RuntimeException(e);
-		// }
+	public static Collection<Class<? extends MotorTest>> getAllClasses(String packageName) {
+		try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
+				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+				BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+			return bufferedReader.lines()
+				.filter(line -> line.endsWith(".class"))
+				.flatMap(line -> getClasses(line, packageName))
+				.collect(Collectors.toSet());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static Stream<Class<? extends MotorTest>> getClasses(String className, String packageName) {

@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 import java.util.OptionalDouble;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MotorTester extends SubsystemBase {
