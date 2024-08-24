@@ -8,10 +8,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Queue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 import com.team2813.MotorTest;
 import com.team2813.Subsystems.MotorTester;
 
@@ -100,31 +103,24 @@ public class TestRunner extends Command {
 	}
 
 	public static Collection<Class<? extends MotorTest>> getAllClasses(String packageName) {
-		try (InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream(packageName.replaceAll("[.]", "/"));
-				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-				BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-			return bufferedReader.lines()
-				.filter(line -> line.endsWith(".class"))
-				.flatMap(line -> getClasses(line, packageName))
-				.collect(Collectors.toSet());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		try {
+			return ClassPath.from(ClassLoader.getSystemClassLoader()).getAllClasses().stream()
+			.filter(clazz -> clazz.getPackageName().equalsIgnoreCase(packageName))
+			.map(ClassInfo::load)
+			.flatMap(TestRunner::castClass)
+			.collect(Collectors.toSet());
+		} catch (Exception e) {
+			return Collections.emptySet();
 		}
 	}
 
-	private static Stream<Class<? extends MotorTest>> getClasses(String className, String packageName) {
-		try {
-            Class<?> rawClass =  Class.forName(packageName + "."
-              + className.substring(0, className.lastIndexOf('.')));
-			if (MotorTest.class.isAssignableFrom(rawClass)) {
-				// guaranteed to succed, as rawClass extends MotorTest (isAssignableFrom test)
-				@SuppressWarnings("unchecked")
-				Class<? extends MotorTest> castedClass = (Class<? extends MotorTest>) rawClass;
-				return Stream.of(castedClass);
-			}
-        } catch (ClassNotFoundException e) {
-            // handle the exception
-        }
-        return Stream.empty();
+	private static Stream<Class<? extends MotorTest>> castClass(Class<?> clazz) {
+		if (MotorTest.class.isAssignableFrom(clazz)) {
+			// guaranteed to succed, as rawClass extends MotorTest (isAssignableFrom test)
+			@SuppressWarnings("unchecked")
+			Class<? extends MotorTest> castedClass = (Class<? extends MotorTest>) clazz;
+			return Stream.of(castedClass);
+		}
+		return Stream.empty();
 	}
 }
