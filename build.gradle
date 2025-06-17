@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2024.3.1"
+    id "edu.wpi.first.GradleRIO" version "2025.1.1"
 }
 
 java {
@@ -53,10 +53,10 @@ dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 
-	implementation "org.json:json:20240303"
-	implementation "com.google.code.gson:gson:2.11.0"
-	implementation "com.google.guava:guava:31.0.1-jre"
-	implementation "com.team2813:lib2813"
+    implementation "org.json:json:20240303"
+    implementation "com.google.code.gson:gson:2.11.0"
+    implementation "com.google.guava:guava:31.0.1-jre"
+    implementation "com.team2813:lib2813"
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
